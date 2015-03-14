@@ -98,22 +98,17 @@ data_filled$day_type[data_filled$day=='Sonntag'] <- 'weekend'
 data_filled$day_type <- as.factor(data_filled$day_type)
 
 #Make a panel plot containing a time series plot of the 5-minute interval and the average number of steps taken, averaged across all weekday days or weekend days.
-steps_per_interval_filled <- data.frame(steps_weekend=NA,steps_weekday=NA,interval=unique(data$interval))
-steps_per_interval_filled$interval <- as.character(steps_per_interval_filled$interval)
-for (interval_i in 1:nrow(steps_per_interval_filled)){   
-  steps_per_interval_filled[interval_i,'steps_weekend'] <- 
-    mean(data_filled[which(data_filled$interval == steps_per_interval_filled[interval_i,'interval'] &
-                             data_filled$day_type == 'weekend'),'steps'])
-  steps_per_interval_filled[interval_i,'steps_weekday'] <- 
-    mean(data_filled[which(data_filled$interval == steps_per_interval_filled[interval_i,'interval'] &
-                             data_filled$day_type == 'weekday'),'steps'])
-}
+steps_per_interval_filled <- aggregate(steps ~ interval+day_type, data = data_filled, FUN = mean)
+
 # The assignment said, "feel free to use any plotting system in R", so I keep using the base system and create the panel equivalent
 par(mfrow=c(2,1))
-plot(x=steps_per_interval_filled$interval,y=steps_per_interval_filled$steps_weekday,type='l', 
+plot(x=steps_per_interval_filled$interval[steps_per_interval_filled$day_type=='weekday'],
+     y=steps_per_interval_filled$steps[steps_per_interval_filled$day_type=='weekday'],type='l', 
      main="Average steps per interval (weekdays)",xlab='interval', ylab='steps')
-plot(x=steps_per_interval_filled$interval,y=steps_per_interval_filled$steps_weekend,type='l', 
+plot(x=steps_per_interval_filled$interval[steps_per_interval_filled$day_type=='weekend'],
+     y=steps_per_interval_filled$steps[steps_per_interval_filled$day_type=='weekend'],type='l', 
      main="Average steps per interval (weekend)",xlab='interval', ylab='steps')
 ```
 
 ![](PA1_template_files/figure-html/differences_weekdays_weekends-1.png) 
+
